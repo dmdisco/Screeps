@@ -14,6 +14,8 @@ var roleRangedDefender = require('role.ranged_defender');
 var roleClaimer = require('role.claimer');
 var roleEnergyMover = require('role.energy_mover');
 
+const pad = (str, length, char = ' ') => str.padStart((str.length + length) / 2, char).padEnd(length, char);
+
 // experimental
 var roomMemory = require('roomMemory');
 
@@ -35,17 +37,22 @@ var room_names = ['W5N8', 'W6N8'];
 var current_room = Game.rooms['W5N8'];
 
 room_status = function() {
-	let stat= '===== Game status =====\n';
-	stat += 'GCL progress:\n';
-	stat += 'current level: ' + Game.gcl.level + '\n';
-	stat += 'Progress to next level: ' + parseFloat((Game.gcl.progress / Game.gcl.progressTotal) * 100).toFixed(2) + '% [' + (Game.gcl.progress + '/' + Game.gcl.progressTotal) + ']' + '\n';
-	stat += 'Creeps in room by role\n----------------------\n';
+	var str_pad = 35;
+	var num_pad = 5;
+	
+	let stat = pad(' Game status ', str_pad + num_pad, '-') + '\n';
+	stat += 'GCL level: '.padEnd(str_pad, ' ') + String(Game.gcl.level).padStart(num_pad, ' ') + '\n';
+	stat += 'Progress to next level: '.padEnd(str_pad, ' ') + parseFloat((Game.gcl.progress / Game.gcl.progressTotal) * 100).toFixed(2) + '% [' + (Game.gcl.progress + '/' + Game.gcl.progressTotal) + ']' + '\n';
+	let storage_container = Game.getObjectById('0aeeb86c8849ae6');
+	stat += 'Energy reserves: '.padEnd(str_pad, ' ') + String(storage_container.store.getUsedCapacity(RESOURCE_ENERGY)).padStart(num_pad, ' ') + '\n';
+	stat += '\n';
+	stat += pad(' Creeps in room ', str_pad + num_pad, '-') + '\n';
 	// show creeps number by role
 	for (let n in spawnables) {
 		let label = spawnables[n].data.role + 's: ';
-		stat += label.padEnd(20, ' ') + String(_.filter(current_room.find(FIND_MY_CREEPS), (creep) => creep.memory.role == spawnables[n].data.role).length).padStart(2, ' ') + '\n';
+		stat += label.padEnd(str_pad, ' ') + String(_.filter(current_room.find(FIND_MY_CREEPS), (creep) => creep.memory.role == spawnables[n].data.role).length).padStart(num_pad, ' ') + '\n';
 	}
-	stat += '=======================\n';
+	stat += ''.padEnd(str_pad + num_pad, '-') + '\n';
 	
 	return stat;
 }

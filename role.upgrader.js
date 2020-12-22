@@ -71,7 +71,13 @@ var roleUpgrader = {
         else {
             //5bbcaca49099fc012e635ef1
             // 
-			var container = Game.getObjectById('49f0726019729e6');
+			let storage_container = Game.getObjectById('0aeeb86c8849ae6');
+			if (storage_container.store.getUsedCapacity(RESOURCE_ENERGY) > 1000) {
+				var container = storage_container;
+			} else {
+				var container = Game.getObjectById('49f0726019729e6');
+			}
+			//var container = Game.getObjectById('49f0726019729e6');
             if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(container, {visualizePathStyle: {stroke: '#05b8ff'}});
             }

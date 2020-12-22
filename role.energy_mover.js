@@ -10,6 +10,10 @@ var roleEnergyMover = {
 		
 		let parts = [CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
 		
+		if (room_energy_capacity >= 500) {
+			parts = [CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE];
+		}
+		
 		return parts;
 	},
 
@@ -61,7 +65,7 @@ var roleEnergyMover = {
         } else {
             creep.memory.containerId = false;
             // drop off energy in storage container
-            var storageContainer = Game.getObjectById('9a2faeae57b6a15');
+            var storageContainer = Game.getObjectById('0aeeb86c8849ae6');
             if(creep.transfer(storageContainer, RESOURCE_ENERGY, creep.carry.energy) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(storageContainer, {visualizePathStyle: {stroke: '#ffffff'}});
             }
