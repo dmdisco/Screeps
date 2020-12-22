@@ -15,7 +15,6 @@ var roleFixer = {
 
     /** @param {Creep} creep **/
     run: function(creep) {
-
         if(creep.memory.fixing && creep.carry.energy == 0) {
             creep.memory.fixing = false;
         }
@@ -62,8 +61,7 @@ var roleFixer = {
                     creep.moveTo(target, {visualizePathStyle: {stroke: '#ff1100'}});
                 }
             }
-        }
-        else {
+        } else {
 			var container = Game.getObjectById('03917011f50820a');
             if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(container, {visualizePathStyle: {stroke: '#ffaa00'}});
@@ -101,8 +99,9 @@ var roleFixer = {
 		
 		// spawn
 		let newName = this.data.name + '_' + Game.time;
-		console.log('Spawning new ' + this.data.role + ': ' + newName);
-		spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role}});
+		if (spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role}}) == OK) {
+			console.log('Spawning new ' + this.data.role + ': ' + newName);
+		}
 	},
 };
 

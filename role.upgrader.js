@@ -8,9 +8,19 @@ var roleUpgrader = {
 	parts: function(room) {
 		let room_energy_capacity = room.energyCapacityAvailable;
 		
-		let parts = [];
+		let parts = [WORK, CARRY, MOVE, MOVE];
 		
-		// max 3 work
+		if (room_energy_capacity >= 450) {
+			parts = [WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE];
+		}
+		if (room_energy_capacity >= 700) {
+			parts = [WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+		}
+		if (room_energy_capacity >= 1250) {
+			parts = [WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+		}
+		
+		/*// max 3 work
 		let works = Math.floor((room_energy_capacity / 3) / BODYPART_COST.work);
 		works = works > 3 ? 3 : works;
 		
@@ -24,7 +34,7 @@ var roleUpgrader = {
 			parts[parts.length] = CARRY;
 			parts[parts.length] = MOVE;
 			room_energy_capacity = room_energy_capacity - (BODYPART_COST.carry + BODYPART_COST.move);
-		}
+		}*/
 		
 		return parts;
 	},
@@ -87,7 +97,7 @@ var roleUpgrader = {
 		}
 		
 		// TODO change this to be calculated by the room
-		var max_upgraders = 6;
+		var max_upgraders = 4;
 		
 		// get all upgraders
 		var upgraders = _.filter(room.find(FIND_MY_CREEPS), (creep) => creep.memory.role == this.data.role);
@@ -97,12 +107,10 @@ var roleUpgrader = {
 		}
 		
 		// spawn
-		//console.log(room.energyAvailable, this.partsCost(room));
-		//if (this.partsCost(room) <= room.energyAvailable) {
-			let newName = this.data.name + '_' + Game.time;
+		let newName = this.data.name + '_' + Game.time;
+		if (spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role}}) == OK) {
 			console.log('Spawning new ' + this.data.role + ': ' + newName);
-			spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role}});
-		//}
+		}
 	},
 };
 

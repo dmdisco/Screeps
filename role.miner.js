@@ -128,8 +128,9 @@ var roleMiner = {
 			
 			// spawn
 			let newName = this.data.name + '_' + Game.time;
-			console.log('Spawning new ' + this.data.role + ': ' + newName);
-			spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role, containerId: assigned_container}});
+			if (spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role, containerId: assigned_container}}) == OK) {
+				console.log('Spawning new ' + this.data.role + ': ' + newName);
+			}
 		}
 	},
 };

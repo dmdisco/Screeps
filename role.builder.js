@@ -8,7 +8,7 @@ var roleBuilder = {
 	parts: function(room) {
 		let room_energy_capacity = room.energyCapacityAvailable;
 		
-		let parts = [WORK,CARRY,MOVE,MOVE];
+		let parts = [WORK,CARRY,MOVE,MOVE,WORK,CARRY,MOVE,MOVE];
 		
 		return parts;
 	},
@@ -62,7 +62,7 @@ var roleBuilder = {
 		}
 		
 		// TODO change this to be calculated by the room
-		var max_builders = 2;
+		var max_builders = 1;
 		
 		// get all builders
 		var builders = _.filter(room.find(FIND_MY_CREEPS), (creep) => creep.memory.role == this.data.role);
@@ -73,8 +73,10 @@ var roleBuilder = {
 		
 		// spawn
 		let newName = this.data.name + '_' + Game.time;
-		console.log('Spawning new ' + this.data.role + ': ' + newName);
-		spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role}});
+		if (spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role}}) == OK) {
+			console.log('Spawning new ' + this.data.role + ': ' + newName);
+		}
+
 	},
 };
 

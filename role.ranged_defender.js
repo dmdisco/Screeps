@@ -113,8 +113,9 @@ var roleRangedDefender = {
 		
 		// spawn
 		let newName = this.data.name + '_' + Game.time;
-		console.log('Spawning new ' + this.data.role + ': ' + newName);
-		spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role}});
+		if (spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role}}) == OK) {
+			console.log('Spawning new ' + this.data.role + ': ' + newName);
+		}
 	},
 };
 

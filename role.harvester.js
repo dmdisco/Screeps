@@ -10,17 +10,23 @@ var roleHarvester = {
 		
 		let parts = [WORK,CARRY,MOVE,MOVE];
 		
-		if (room.energyAvailable > 300 && room_energy_capacity >= 500) {
+		/*if (room.energyAvailable > 300 && room_energy_capacity >= 500) {
 			parts = [WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE];
-		}
+		}*/
 		
 		return parts;
 	},
 
     /** @param {Creep} creep **/
     run: function(creep) {
-        if(creep.carry.energy < creep.carryCapacity) {
-			var container = Game.getObjectById('03917011f50820a');
+        if (creep.carry.energy < creep.carryCapacity) {
+			var container1 = Game.getObjectById('03917011f50820a');
+			var container2 = Game.getObjectById('49f0726019729e6');
+			let container = container1;
+			if (container1.store.getUsedCapacity(RESOURCE_ENERGY) < 200) {
+				container = container2;
+			}
+			
             if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(container, {visualizePathStyle: {stroke: '#ffaa00'}});
             }
@@ -32,8 +38,7 @@ var roleHarvester = {
             if(creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(sources[0], {visualizePathStyle: {stroke: '#ffaa00'}});
             }*/
-        }
-        else {
+        } else {
             var targets = creep.room.find(FIND_STRUCTURES, {
                 filter: (structure) => {
                     return (structure.structureType == STRUCTURE_EXTENSION ||
@@ -74,8 +79,9 @@ var roleHarvester = {
 		
 		// spawn
 		let newName = this.data.name + '_' + Game.time;
-		console.log('Spawning new ' + this.data.role + ': ' + newName);
-		spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role}});
+		if (spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role}}) == OK) {
+			console.log('Spawning new ' + this.data.role + ': ' + newName);
+		}
 	},
 };
 

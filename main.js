@@ -12,6 +12,7 @@ var roleFixer = require('role.fixer');
 var roleMiner = require('role.miner');
 var roleRangedDefender = require('role.ranged_defender');
 var roleClaimer = require('role.claimer');
+var roleEnergyMover = require('role.energy_mover');
 
 // experimental
 var roomMemory = require('roomMemory');
@@ -25,6 +26,7 @@ var spawnables = [
 	roleUpgrader,
 	roleBuilder,
 	roleClaimer,
+	roleEnergyMover,
 ];
 
 var room_names = ['W5N8', 'W6N8'];
@@ -33,7 +35,7 @@ var room_names = ['W5N8', 'W6N8'];
 var current_room = Game.rooms['W5N8'];
 
 room_status = function() {
-	let stat= '===== Game status =====';
+	let stat= '===== Game status =====\n';
 	stat += 'GCL progress:\n';
 	stat += 'current level: ' + Game.gcl.level + '\n';
 	stat += 'Progress to next level: ' + parseFloat((Game.gcl.progress / Game.gcl.progressTotal) * 100).toFixed(2) + '% [' + (Game.gcl.progress + '/' + Game.gcl.progressTotal) + ']' + '\n';
@@ -116,6 +118,9 @@ module.exports.loop = function () {
         }
         if(creep.memory.role == 'claimer') {
             roleClaimer.run(creep);
+        }
+        if(creep.memory.role == 'energy_mover') {
+            roleEnergyMover.run(creep);
         }
     }
 	
