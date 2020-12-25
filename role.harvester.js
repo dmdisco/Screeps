@@ -59,7 +59,7 @@ module.exports = class roleHarvester extends Role {
     }
 	
 	/** @param {Room} room **/
-	spawn(room) {
+	spawn(room, spawn) {
 		// TODO change this to closest room spawner
 		var spawn = Game.spawns['Spawn1'];
 		

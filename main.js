@@ -9,11 +9,15 @@
 //   - if storage container exists then grap from that
 //   - if containers exists but no storage container grap from the closest that has more than x energy in it
 
+// 1 room manager
+// 2 source manager
+// 3 controller manager
+// 4 energy manager
+// 5 build manager
+
 //require('constants');
 
 //var stateMachine = require('state_machine');
-
-//console.log(stateMachine.test());
 
 let roles = [
 	require('role.harvester'),
@@ -25,6 +29,8 @@ for (let role of roles) {
 
 var Harvester = require('role.harvester');
 var roleHarvester = new Harvester();
+var Attacker = require('role.attacker');
+var roleAttacker = new Attacker();
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
 var roleFixer = require('role.fixer');
@@ -32,7 +38,8 @@ var roleMiner = require('role.miner');
 var roleRangedDefender = require('role.ranged_defender');
 var roleClaimer = require('role.claimer');
 var roleEnergyMover = require('role.energy_mover');
-var roleMissionary = require('role.missionary');
+var Missionary = require('role.missionary');
+var roleMissionary = new Missionary();
 
 const pad = (str, length, char = ' ') => str.padStart((str.length + length) / 2, char).padEnd(length, char);
 
@@ -50,6 +57,7 @@ var spawnables = [
 	roleClaimer,
 	roleEnergyMover,
 	roleMissionary,
+	roleAttacker,
 ];
 
 var room_names = ['W5N8', 'W6N8'];
@@ -64,6 +72,16 @@ function catchErrors(callback) {
 		console.log('<span style="color: #ff5454">Error: ' + error.stack + '</span>');
 	}
 }
+
+var RoomManager = require('room.manager');
+//console.log(stateMachine.test());
+/*for (let room_name in Game.rooms) {
+	console.log(room_name);
+}*/
+
+//Memory.expansions = ['W6N8'];
+//console.log(Memory.expansions);
+
 
 room_status = function() {
 	var str_pad = 35;
@@ -105,10 +123,13 @@ module.exports.loop = function () {
 	}
 	
 	for (let room_name in Game.rooms) {
-		let room = Game.rooms[room_name];
-		/*if (room.manager()) {
+		/*let room = Game.rooms[room_name];
+		if (room.manager()) {
 			catchErrors(() => room.ai().run());
 		}*/
+		let roomManager = new RoomManager(room_name);
+		// run the room manager for current room
+		catchErrors(() => roomManager.run());
 	}
 	
 	/*for(var spawnName in Game.spawns){
@@ -177,6 +198,9 @@ module.exports.loop = function () {
         }
         if(creep.memory.role == 'missionary') {
             roleMissionary.run(creep);
+        }
+        if(creep.memory.role == 'attacker') {
+            roleAttacker.run(creep);
         }
     }
 	

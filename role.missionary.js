@@ -1,33 +1,43 @@
-var roleMissionary = {
-	data: {
-		name: 'Missionary',
-		role: 'missionary',
-	},
+require('constants');
+var Role = require('role');
+
+module.exports = class roleMissionary extends Role {
+	constructor() {
+		super();
+		this.data = {
+			name: 'Missionary',
+			role: 'missionary',
+		}
+	}
 	
 	/** @param {Room} room **/
-	parts: function(room) {
+	parts(room) {
 		let room_energy_capacity = room.energyCapacityAvailable;
 		
 		let parts = [WORK,CARRY,MOVE,MOVE];
 		
 		return parts;
-	},
+	}
 
     /** @param {Creep} creep **/
-    run: function(creep) {
+    run(creep) {
 		// first go to room
 		if (creep.room.name != creep.memory.room_target) {
 			// lets move to the room
 			creep.moveTo(new RoomPosition(25, 20, creep.memory.room_target), {visualizePathStyle: {stroke: '#ffffff'}});
 		} else {
-			creep.moveTo(creep.room.controller, {visualizePathStyle: {stroke: '#ffffff'}});
+			if(creep.reserveController(creep.room.controller) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(creep.room.controller, {visualizePathStyle: {stroke: PATH_COLOR_CLAIM}});
+            } else {
+				creep.say('claiming');
+			}
 			
-			// change role as needed
+			/*// change role as needed
 			var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
             if(targets.length) {
 				// we need a builder
 				creep.memory.role = 'builder';
-			}
+			}*/
 		}
 		return;
 		// then build spawner
@@ -107,10 +117,10 @@ var roleMissionary = {
 				creep.moveTo(Game.flags['idle']);
 			}*/
         }
-    },
+    }
 	
 	/** @param {Room} room **/
-	spawn: function(room) {
+	spawn(room) {
 		// TODO change this to closest room spawner
 		var spawn = Game.spawns['Spawn1'];
 		
@@ -135,7 +145,5 @@ var roleMissionary = {
 		if (spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role, room_target: 'W6N8'}}) == OK) {
 			console.log('Spawning new ' + this.data.role + ': ' + newName);
 		}
-	},
-};
-
-module.exports = roleMissionary;
+	}
+}
