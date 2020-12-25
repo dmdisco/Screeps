@@ -18,18 +18,16 @@ var roleBuilder = {
 
         if(creep.memory.building && creep.carry.energy == 0) {
             creep.memory.building = false;
-            //creep.say('🔄 harvest');
         }
         if(!creep.memory.building && creep.carry.energy == creep.carryCapacity) {
             creep.memory.building = true;
-            //creep.say('🚧 build');
         }
 
         if(creep.memory.building) {
             var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
             if(targets.length) {
 				let target = targets[0];
-				//let target = Game.getObjectById('e9a16d4d9a545b0');
+				//let target = Game.getObjectById('761c4969181bac1');
                 if(creep.build(target) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
                 }
@@ -67,8 +65,14 @@ var roleBuilder = {
 			return false;
 		}
 		
+		// nothing to build so dont spawn
+		var targets = room.find(FIND_CONSTRUCTION_SITES);
+		if (targets.length == 0) {
+			return false;
+		}
+		
 		// TODO change this to be calculated by the room
-		var max_builders = 1;
+		var max_builders = 2;
 		
 		// get all builders
 		var builders = _.filter(room.find(FIND_MY_CREEPS), (creep) => creep.memory.role == this.data.role);

@@ -33,7 +33,7 @@ var roleEnergyMover = {
                     // get all containers in the room
     	            var containers = creep.room.find(FIND_STRUCTURES, {
                         filter: (structure) => {
-                            return (structure.structureType == STRUCTURE_CONTAINER) && (structure.store[RESOURCE_ENERGY] > 1000);
+                            return (structure.structureType == STRUCTURE_CONTAINER) && (structure.store[RESOURCE_ENERGY] > 500);
                         }
                     });
                     
@@ -83,7 +83,7 @@ var roleEnergyMover = {
 		}
 		
 		// TODO change this to be calculated by the room
-		var max_type_of_creep = 1;
+		var max_type_of_creep = 2;
 		
 		// get all creeps of this type
 		var creeps_of_type = _.filter(room.find(FIND_MY_CREEPS), (creep) => creep.memory.role == this.data.role);

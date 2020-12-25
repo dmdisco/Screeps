@@ -2,8 +2,18 @@
 
 // prioritized spawning que system
 // room leveling system (0 for new room, 1 for starting etc,)
+// state machine pattern
+// get energy should be split up so
+//   - if no containers or storage containers then go harvest
+//   - elseif storage container but no container and you are a build grap from that
+//   - if storage container exists then grap from that
+//   - if containers exists but no storage container grap from the closest that has more than x energy in it
 
+//require('constants');
 
+//var stateMachine = require('state_machine');
+
+//console.log(stateMachine.test());
 
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
@@ -13,6 +23,7 @@ var roleMiner = require('role.miner');
 var roleRangedDefender = require('role.ranged_defender');
 var roleClaimer = require('role.claimer');
 var roleEnergyMover = require('role.energy_mover');
+var roleMissionary = require('role.missionary');
 
 const pad = (str, length, char = ' ') => str.padStart((str.length + length) / 2, char).padEnd(length, char);
 
@@ -22,13 +33,14 @@ var roomMemory = require('roomMemory');
 // spawnable screep roles
 var spawnables = [
 	roleHarvester,
-	roleRangedDefender,
+	/*roleRangedDefender,*/
 	roleFixer,
 	roleMiner,
 	roleUpgrader,
 	roleBuilder,
 	roleClaimer,
 	roleEnergyMover,
+	roleMissionary,
 ];
 
 var room_names = ['W5N8', 'W6N8'];
@@ -89,7 +101,11 @@ module.exports.loop = function () {
 
 	// spawn new creeps if any are missing
 	for (let n in spawnables) {
-		spawnables[n].spawn(current_room);
+		try {
+			spawnables[n].spawn(current_room);
+		} catch (err) {
+			console.log(err);
+		}
 	}
 
     // display spawning message at spawn
@@ -106,7 +122,11 @@ module.exports.loop = function () {
    for (var name in Game.creeps) {
         var creep = Game.creeps[name];
         if(creep.memory.role == 'harvester') {
-            roleHarvester.run(creep);
+			try {
+				roleHarvester.run(creep);
+			} catch (err) {
+				console.log(err);
+			}
         }
         if(creep.memory.role == 'upgrader') {
             roleUpgrader.run(creep);
@@ -128,6 +148,9 @@ module.exports.loop = function () {
         }
         if(creep.memory.role == 'energy_mover') {
             roleEnergyMover.run(creep);
+        }
+        if(creep.memory.role == 'missionary') {
+            roleMissionary.run(creep);
         }
     }
 	

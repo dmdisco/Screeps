@@ -8,7 +8,7 @@ var roleClaimer = {
 	parts: function(room) {
 		let room_energy_capacity = room.energyCapacityAvailable;
 		
-		let parts = [MOVE,CLAIM,CLAIM];
+		let parts = [MOVE,MOVE,CLAIM,CLAIM];
 		
 		return parts;
 	},
@@ -32,15 +32,20 @@ var roleClaimer = {
 			creep.moveTo(new RoomPosition(25, 20, creep.memory.room_target), {visualizePathStyle: {stroke: '#ffffff'}});
 		} else {
 			// can i claim a room
-			if (Game.gcl.level > Game.rooms.length) {
+			console.log(Game.gcl.level, Game.rooms);
+			if (Game.gcl.level > 1) {
 				// and when we are in the room lets move to the controller
 				if(creep.claimController(creep.room.controller) == ERR_NOT_IN_RANGE) {
 					creep.moveTo(creep.room.controller, {visualizePathStyle: {stroke: '#ffffff'}});
+				} else {
+					creep.say('claiming');
 				}
 			} else {
 				// and when we are in the room lets move to the controller
 				if(creep.reserveController(creep.room.controller) == ERR_NOT_IN_RANGE) {
 					creep.moveTo(creep.room.controller, {visualizePathStyle: {stroke: '#ffffff'}});
+				} else {
+					creep.say('reserving');
 				}
 			}
 		}
@@ -68,10 +73,9 @@ var roleClaimer = {
 		}
 		
 		// spawn
-		if (this.partsCost(room) <= room.energyAvailable) {
-			let newName = this.data.name + '_' + Game.time;
+		let newName = this.data.name + '_' + Game.time;
+		if (spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role, room_target: 'W6N8'}}) == OK) {
 			console.log('Spawning new ' + this.data.role + ': ' + newName);
-			spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role, room_target: 'W6N8'}});
 		}
 	},
 };

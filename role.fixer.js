@@ -50,6 +50,11 @@ var roleFixer = {
 						   creep.memory.fixing = structure.id;
 					   }
 					});
+					
+					// temp fix for only walls to fix
+					if (creep.memory.fixing === true) {
+						creep.moveTo(Game.flags['idle']);
+					}
 				} else {
 					// goto sleep
 					creep.moveTo(Game.flags['idle']);
@@ -57,12 +62,16 @@ var roleFixer = {
             } else {
                 //
                 var target = Game.getObjectById(creep.memory.fixing);
-                if(creep.repair(target) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target, {visualizePathStyle: {stroke: '#ff1100'}});
-                }
+				if (target.hits < target.hitsMax) {
+					if(creep.repair(target) == ERR_NOT_IN_RANGE) {
+						creep.moveTo(target, {visualizePathStyle: {stroke: '#ff1100'}});
+					}
+				} else {
+					creep.memory.fixing = false;
+				}
             }
         } else {
-			var container = Game.getObjectById('03917011f50820a');
+			var container = Game.getObjectById('0aeeb86c8849ae6');
             if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(container, {visualizePathStyle: {stroke: '#ffaa00'}});
             }
@@ -88,7 +97,7 @@ var roleFixer = {
 		}
 		
 		// TODO change this to be calculated by the room
-		var max_fixers = 1;
+		var max_fixers = 2;
 		
 		// get all fixers
 		var fixers = _.filter(room.find(FIND_MY_CREEPS), (creep) => creep.memory.role == this.data.role);

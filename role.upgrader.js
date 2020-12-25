@@ -103,7 +103,7 @@ var roleUpgrader = {
 		}
 		
 		// TODO change this to be calculated by the room
-		var max_upgraders = 4;
+		var max_upgraders = 5;
 		
 		// get all upgraders
 		var upgraders = _.filter(room.find(FIND_MY_CREEPS), (creep) => creep.memory.role == this.data.role);
