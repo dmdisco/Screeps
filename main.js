@@ -15,7 +15,16 @@
 
 //console.log(stateMachine.test());
 
-var roleHarvester = require('role.harvester');
+let roles = [
+	require('role.harvester'),
+]
+
+for (let role of roles) {
+	
+}
+
+var Harvester = require('role.harvester');
+var roleHarvester = new Harvester();
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
 var roleFixer = require('role.fixer');
@@ -48,6 +57,14 @@ var room_names = ['W5N8', 'W6N8'];
 // TODO fix so we can work in multiple rooms
 var current_room = Game.rooms['W5N8'];
 
+function catchErrors(callback) {
+	try {
+		callback();
+	} catch(error) {
+		console.log('<span style="color: #ff5454">Error: ' + error.stack + '</span>');
+	}
+}
+
 room_status = function() {
 	var str_pad = 35;
 	var num_pad = 5;
@@ -66,6 +83,8 @@ room_status = function() {
 	}
 	stat += ''.padEnd(str_pad + num_pad, '-') + '\n';
 	
+	//console.log('<span style="color: #faa">' + Game.gcl.level + '</span>');
+	
 	return stat;
 }
 
@@ -83,6 +102,13 @@ module.exports.loop = function () {
 			delete Memory.spawns[name];
 			console.log('Clearing non-existing spawn memory:', name);
 		}
+	}
+	
+	for (let room_name in Game.rooms) {
+		let room = Game.rooms[room_name];
+		/*if (room.manager()) {
+			catchErrors(() => room.ai().run());
+		}*/
 	}
 	
 	/*for(var spawnName in Game.spawns){
