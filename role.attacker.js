@@ -94,7 +94,7 @@ module.exports = class roleAttacker extends Role {
 		}
 		
 		// TODO change this to be calculated by the room
-		var max_of_role = 4;
+		var max_of_role = 0;
 		
 		// get all creeps of type
 		var creeps_of_type = _.filter(Game.creeps, (creep) => creep.memory.role == this.data.role);

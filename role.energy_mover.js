@@ -1,11 +1,17 @@
-var roleEnergyMover = {
-	data: {
-		name: 'EnergyMover',
-		role: 'energy_mover',
-	},
+require('constants');
+var Role = require('role');
+
+module.exports = class roleEnergyMover extends Role {
+	constructor() {
+		super();
+		this.data = {
+			name: 'EnergyMover',
+			role: 'energy_mover',
+		}
+	}
 	
 	/** @param {Room} room **/
-	parts: function(room) {
+	parts(room) {
 		let room_energy_capacity = room.energyCapacityAvailable;
 		
 		let parts = [CARRY,CARRY,CARRY,MOVE,MOVE,MOVE];
@@ -15,10 +21,17 @@ var roleEnergyMover = {
 		}
 		
 		return parts;
-	},
+	}
 
     /** @param {Creep} creep **/
-    run: function(creep) {
+    run(creep) {
+		// move to correct room
+		if (creep.room.name != creep.memory.home) {
+			// lets move to the room
+			creep.moveTo(new RoomPosition(25, 20, creep.memory.home), {visualizePathStyle: {stroke: '#ffffff'}});
+			return;
+		}
+		
 	    if(creep.carry.energy < creep.carryCapacity) {
 	        // if no containerId is set then select a new
 	        if (!creep.memory.containerId) {
@@ -39,7 +52,7 @@ var roleEnergyMover = {
                     
                     if (!containers.length) {
                         creep.say('Paused');
-                        creep.moveTo(Game.flags.idle, {visualizePathStyle: {stroke: '#ffffff'}});
+                        creep.moveTo(Game.flags['idle_' + creep.memory.home], {visualizePathStyle: {stroke: '#ffffff'}});
                         return;
                     }
     
@@ -55,7 +68,11 @@ var roleEnergyMover = {
                         var selectedContainer = _.max( allContainers, function( container ){ return container.energyPercent; });
                     }
                     
-                    creep.memory.containerId = selectedContainer.id;
+                    if (selectedContainer == undefined) {
+						creep.memory.containerId = undefined;
+					} else {
+						creep.memory.containerId = selectedContainer.id;
+					}
                 }
 	        }
 	        var container = Game.getObjectById(creep.memory.containerId);
@@ -70,12 +87,16 @@ var roleEnergyMover = {
                 creep.moveTo(storageContainer, {visualizePathStyle: {stroke: '#ffffff'}});
             }
         }
-	},
+	}
 	
 	/** @param {Room} room **/
-	spawn: function(room) {
+	spawn(room) {
 		// TODO change this to closest room spawner
-		var spawn = Game.spawns['Spawn1'];
+		let spawn = this.getSpawn(room);
+		
+		if (!room.storage) {
+			return false;
+		}
 		
 		// if spawn is allready spawning then lets just skip for now
 		if (spawn.spawning) {
@@ -94,10 +115,8 @@ var roleEnergyMover = {
 		
 		// spawn
 		let newName = this.data.name + '_' + Game.time;
-		if (spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role}}) == OK) {
-			console.log('Spawning new ' + this.data.role + ': ' + newName);
+		if (spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role, home: room.name}}) == OK) {
+			console.log('Spawning new ' + this.data.role + ': ' + newName + ' in: ' + room.name);
 		}
-	},
-};
-
-module.exports = roleEnergyMover;
+	}
+}

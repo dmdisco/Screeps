@@ -12,19 +12,19 @@ module.exports = {
 		
 		switch(creep.memory.state) {
 			case STATE_SPAWNING:
-				runSpawning(creep, STATE_MOVING);
+				runSpawning(creep);
 				break;
 			case STATE_MOVING:
 				runMoving(creep);
 				break;
 			case STATE_HARVESTING:
-				runHarvesting(creep, STATE_GRAB_RESOURCE);
+				runHarvesting(creep);
 				break;
 			case STATE_DEPOSIT_RESOURCE:
-				runDepositing(creep, STATE_MOVING);
+				runDepositing(creep);
 				break;
 			case STATE_GRAB_RESOURCE:
-				runGrabResource(creep, STATE_MOVING);
+				runGrabResource(creep);
 				break;
 		}
 	},

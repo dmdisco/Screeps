@@ -31,13 +31,18 @@ var Harvester = require('role.harvester');
 var roleHarvester = new Harvester();
 var Attacker = require('role.attacker');
 var roleAttacker = new Attacker();
-var roleUpgrader = require('role.upgrader');
-var roleBuilder = require('role.builder');
-var roleFixer = require('role.fixer');
-var roleMiner = require('role.miner');
+var Upgrader = require('role.upgrader');
+var roleUpgrader = new Upgrader();
+var Builder = require('role.builder');
+var roleBuilder = new Builder();
+var Fixer = require('role.fixer');
+var roleFixer = new Fixer();
+var Miner = require('role.miner');
+var roleMiner = new Miner();
 var roleRangedDefender = require('role.ranged_defender');
 var roleClaimer = require('role.claimer');
-var roleEnergyMover = require('role.energy_mover');
+var EnergyMover = require('role.energy_mover');
+var roleEnergyMover = new EnergyMover();
 var Missionary = require('role.missionary');
 var roleMissionary = new Missionary();
 
@@ -93,11 +98,14 @@ room_status = function() {
 	let storage_container = Game.getObjectById('0aeeb86c8849ae6');
 	stat += 'Energy reserves: '.padEnd(str_pad, ' ') + String(storage_container.store.getUsedCapacity(RESOURCE_ENERGY)).padStart(num_pad, ' ') + '\n';
 	stat += '\n';
-	stat += pad(' Creeps in room ', str_pad + num_pad, '-') + '\n';
-	// show creeps number by role
-	for (let n in spawnables) {
-		let label = spawnables[n].data.role + 's: ';
-		stat += label.padEnd(str_pad, ' ') + String(_.filter(current_room.find(FIND_MY_CREEPS), (creep) => creep.memory.role == spawnables[n].data.role).length).padStart(num_pad, ' ') + '\n';
+	for (let room_name in Game.rooms) {
+		let room = Game.rooms[room_name];
+		stat += pad(' Creeps in room ' + room_name + ' ', str_pad + num_pad, '-') + '\n';
+		// show creeps number by role
+		for (let n in spawnables) {
+			let label = spawnables[n].data.role + 's: ';
+			stat += label.padEnd(str_pad, ' ') + String(_.filter(room.find(FIND_MY_CREEPS), (creep) => creep.memory.role == spawnables[n].data.role).length).padStart(num_pad, ' ') + '\n';
+		}
 	}
 	stat += ''.padEnd(str_pad + num_pad, '-') + '\n';
 	
@@ -108,18 +116,41 @@ room_status = function() {
 
 module.exports.loop = function () {
     // collect garbage globally
+	var clearedMemory = [];
 	for (var name in Memory.creeps) {
         if(!Game.creeps[name]) {
             delete Memory.creeps[name];
-            console.log('Clearing non-existing creep memory:', name);
+			clearedMemory[clearedMemory.length] = name;
         }
     }
+	if (clearedMemory.length > 0) {
+		console.log('Clearing non-existing creep memory:\n', clearedMemory.join(', '));
+		clearedMemory = [];
+	}
 	
 	for (var name in Memory.spawns) {
 		if (!Game.spawns[name]) {
 			delete Memory.spawns[name];
 			console.log('Clearing non-existing spawn memory:', name);
 		}
+	}
+	
+	for (let room_name in Game.rooms) {
+		let room = Game.rooms[room_name];
+		for (let n in spawnables) {
+			/*try {
+				spawnables[n].spawn(room);
+			} catch (err) {
+				console.log(err);
+			}*/
+			catchErrors(() => spawnables[n].spawn(room));
+		}
+		/*if (room.manager()) {
+			catchErrors(() => room.ai().run());
+		}*/
+		//let roomManager = new RoomManager(room_name);
+		// run the room manager for current room
+		//catchErrors(() => roomManager.run());
 	}
 	
 	for (let room_name in Game.rooms) {
@@ -147,13 +178,6 @@ module.exports.loop = function () {
 	}*/
 
 	// spawn new creeps if any are missing
-	for (let n in spawnables) {
-		try {
-			spawnables[n].spawn(current_room);
-		} catch (err) {
-			console.log(err);
-		}
-	}
 
     // display spawning message at spawn
 	if (Game.spawns['Spawn1'].spawning) { 
@@ -165,27 +189,37 @@ module.exports.loop = function () {
             {align: 'left', opacity: 0.8});
     }
     
+	if (Game.spawns['Spawn2'].spawning) { 
+        var spawningCreep = Game.creeps[Game.spawns['Spawn2'].spawning.name];
+        Game.spawns['Spawn2'].room.visual.text(
+            ' ' + spawningCreep.memory.role,
+            Game.spawns['Spawn2'].pos.x + 1, 
+            Game.spawns['Spawn2'].pos.y, 
+            {align: 'left', opacity: 0.8});
+    }
+    
    // run screeps
    for (var name in Game.creeps) {
         var creep = Game.creeps[name];
         if(creep.memory.role == 'harvester') {
-			try {
+			/*try {
 				roleHarvester.run(creep);
 			} catch (err) {
 				console.log(err);
-			}
+			}*/
+			catchErrors(() => roleHarvester.run(creep));
         }
         if(creep.memory.role == 'upgrader') {
-            roleUpgrader.run(creep);
+            catchErrors(() => roleUpgrader.run(creep));
         }
         if(creep.memory.role == 'builder') {
-            roleBuilder.run(creep);
+            catchErrors(() => roleBuilder.run(creep));
         }
         if(creep.memory.role == 'fixer') {
-            roleFixer.run(creep);
+            catchErrors(() => roleFixer.run(creep));
         }
         if(creep.memory.role == 'miner') {
-            roleMiner.run(creep);
+            catchErrors(() => roleMiner.run(creep));
         }
         if(creep.memory.role == 'ranged_defender') {
             roleRangedDefender.run(creep);
@@ -194,7 +228,7 @@ module.exports.loop = function () {
             roleClaimer.run(creep);
         }
         if(creep.memory.role == 'energy_mover') {
-            roleEnergyMover.run(creep);
+            catchErrors(() => roleEnergyMover.run(creep));
         }
         if(creep.memory.role == 'missionary') {
             roleMissionary.run(creep);

@@ -1,6 +1,12 @@
 require('constants');
 
 class Role {
+	getSpawn(room) {
+		let targets = room.find(FIND_MY_SPAWNS);
+		
+		return targets[0];
+	}
+	
 	hasEnergy(creep) {
 		// for now just return true if full
 		return (creep.carry.energy < creep.carryCapacity);
@@ -36,7 +42,7 @@ class Role {
 				// get closest container with energy in it
 				let container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
 					filter: (structure) => {
-						return structure.structureType == STRUCTURE_CONTAINER && structure.store.getUsedCapacity(RESOURCE_ENERGY) > 1000;
+						return structure.structureType == STRUCTURE_CONTAINER && structure.store.getUsedCapacity(RESOURCE_ENERGY) > 500;
 					}
 				});
 				
@@ -48,6 +54,12 @@ class Role {
 					// TODO maybe check for sources cause they could have been blocked
 					source_target = source;
 				}
+			}
+			
+			if (source_target == undefined) {
+				//we have no where to mine
+				// TODO report somthing here
+				return;
 			}
 			
 			creep.memory.source = source_target.id;

@@ -1,4 +1,4 @@
-//require('constants');
+require('constants');
 var Role = require('role');
 
 module.exports = class roleHarvester extends Role {
@@ -25,6 +25,14 @@ module.exports = class roleHarvester extends Role {
 
     /** @param {Creep} creep **/
     run(creep) {
+		//creep.memory.home = 'W6N8';
+		// move to correct room
+		if (creep.room.name != creep.memory.home) {
+			// lets move to the room
+			creep.moveTo(new RoomPosition(25, 20, creep.memory.home), {visualizePathStyle: {stroke: '#ffffff'}});
+			return;
+		}
+
         if (this.hasEnergy(creep)) {
 			this.getEnergy(creep, true);
         } else {
@@ -42,7 +50,7 @@ module.exports = class roleHarvester extends Role {
 			
 			// if there is no targets to fill then relax
 			if (target == null) {
-				creep.moveTo(Game.flags['idle']);
+				creep.moveTo(Game.flags['idle_' + creep.memory.home]);
 			}
 			//creep.memory.target = target.id;
 			
@@ -53,15 +61,15 @@ module.exports = class roleHarvester extends Role {
                 }
             } else {
 				// goto sleep
-				creep.moveTo(Game.flags['idle']);
+				creep.moveTo(Game.flags['idle_' + creep.memory.home]);
 			}
         }
     }
 	
 	/** @param {Room} room **/
-	spawn(room, spawn) {
+	spawn(room) {
 		// TODO change this to closest room spawner
-		var spawn = Game.spawns['Spawn1'];
+		let spawn = this.getSpawn(room);
 		
 		// if spawn is allready spawning then lets just skip for now
 		if (spawn.spawning) {
@@ -74,14 +82,16 @@ module.exports = class roleHarvester extends Role {
 		// get all harvesters
 		var harvesters = _.filter(room.find(FIND_MY_CREEPS), (creep) => creep.memory.role == this.data.role);
 		
+		//if (room.name == 'W6N8') console.log(harvesters.length >= max_harvesters);
+		
 		if (harvesters.length >= max_harvesters) {
 			return false;
 		}
 		
 		// spawn
 		let newName = this.data.name + '_' + Game.time;
-		if (spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role}}) == OK) {
-			console.log('Spawning new ' + this.data.role + ': ' + newName);
+		if (spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role, home: room.name}}) == OK) {
+			console.log('Spawning new ' + this.data.role + ': ' + newName + ' in: ' + room.name);
 		}
 	}
 }

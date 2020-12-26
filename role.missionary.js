@@ -14,7 +14,7 @@ module.exports = class roleMissionary extends Role {
 	parts(room) {
 		let room_energy_capacity = room.energyCapacityAvailable;
 		
-		let parts = [WORK,CARRY,MOVE,MOVE];
+		let parts = [CLAIM,MOVE];
 		
 		return parts;
 	}
@@ -26,7 +26,7 @@ module.exports = class roleMissionary extends Role {
 			// lets move to the room
 			creep.moveTo(new RoomPosition(25, 20, creep.memory.room_target), {visualizePathStyle: {stroke: '#ffffff'}});
 		} else {
-			if(creep.reserveController(creep.room.controller) == ERR_NOT_IN_RANGE) {
+			if(creep.claimController(creep.room.controller) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(creep.room.controller, {visualizePathStyle: {stroke: PATH_COLOR_CLAIM}});
             } else {
 				creep.say('claiming');

@@ -1,11 +1,17 @@
-var roleMiner = {
-	data: {
-		name: 'Miner',
-		role: 'miner',
-	},
+require('constants');
+var Role = require('role');
+
+module.exports = class roleMiner extends Role {
+	constructor() {
+		super();
+		this.data = {
+			name: 'Miner',
+			role: 'miner',
+		}
+	}
 	
 	/** @param {Room} room **/
-	parts: function(room) {
+	parts(room) {
 		let room_energy_capacity = room.energyCapacityAvailable;
 		
 		// we need a move and the rest can be work
@@ -21,10 +27,10 @@ var roleMiner = {
 		}
 		
 		return parts;
-	},
+	}
 
     /** @param {Creep} creep **/
-    run: function(creep) {
+    run(creep) {
         if (!creep.memory.containerId) {
             // we need a new containerId
             let containers = creep.room.find(FIND_STRUCTURES, {
@@ -77,12 +83,13 @@ var roleMiner = {
                 creep.say('In: ' + container.store.energy);
             }
         }
-	},
+	}
 	
 	/** @param {Room} room **/
-	spawn: function(room) {
+	spawn(room) {
 		// TODO change this to closest room spawner
-		var spawn = Game.spawns['Spawn1'];
+		//var spawn = Game.spawns['Spawn1'];
+		let spawn = this.getSpawn(room);
 		
 		// if spawn is allready spawning then lets just skip for now
 		if (spawn.spawning) {
@@ -102,7 +109,7 @@ var roleMiner = {
 		}
 		
 		// get all miners
-		var miners = _.filter(Game.creeps, (creep) => creep.memory.role == this.data.role);
+		var miners = _.filter(room.find(FIND_MY_CREEPS), (creep) => creep.memory.role == this.data.role);
 		
 		// array of used containers
 		var usedContainers = [];
@@ -128,11 +135,9 @@ var roleMiner = {
 			
 			// spawn
 			let newName = this.data.name + '_' + Game.time;
-			if (spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role, containerId: assigned_container}}) == OK) {
-				console.log('Spawning new ' + this.data.role + ': ' + newName);
+			if (spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role, home: room.name, containerId: assigned_container}}) == OK) {
+				console.log('Spawning new ' + this.data.role + ': ' + newName + ' in: ' + room.name);
 			}
 		}
-	},
-};
-
-module.exports = roleMiner;
+	}
+}

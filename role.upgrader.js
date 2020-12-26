@@ -1,11 +1,17 @@
-var roleUpgrader = {
-	data: {
-		name: 'Upgrader',
-		role: 'upgrader',
-	},
+require('constants');
+var Role = require('role');
+
+module.exports = class roleUpgrader extends Role {
+	constructor() {
+		super();
+		this.data = {
+			name: 'Upgrader',
+			role: 'upgrader',
+		}
+	}
 	
 	/** @param {Room} room **/
-	parts: function(room) {
+	parts(room) {
 		let room_energy_capacity = room.energyCapacityAvailable;
 		
 		let parts = [WORK, CARRY, MOVE, MOVE];
@@ -37,9 +43,9 @@ var roleUpgrader = {
 		}*/
 		
 		return parts;
-	},
+	}
 	
-	partsCost: function(room) {
+	partsCost(room) {
 		let part_cost = 0;
 		
 		var parts = this.parts(room);
@@ -49,10 +55,16 @@ var roleUpgrader = {
 		}
 		
 		return part_cost;
-	},
+	}
 
     /** @param {Creep} creep **/
-    run: function(creep) {
+    run(creep) {
+		// move to correct room
+		if (creep.room.name != creep.memory.home) {
+			// lets move to the room
+			creep.moveTo(new RoomPosition(25, 20, creep.memory.home), {visualizePathStyle: {stroke: '#ffffff'}});
+			return;
+		}
 
         if(creep.memory.upgrading && creep.carry.energy == 0) {
             creep.memory.upgrading = false;
@@ -69,6 +81,8 @@ var roleUpgrader = {
             }
         }
         else {
+			this.getEnergy(creep, true);
+			/*
             //5bbcaca49099fc012e635ef1
             // 
 			let storage_container = Game.getObjectById('0aeeb86c8849ae6');
@@ -90,20 +104,27 @@ var roleUpgrader = {
                 creep.moveTo(sources[0], {visualizePathStyle: {stroke: '#ffaa00'}});
             }*/
         }
-    },
+    }
 	
 	/** @param {Room} room **/
-	spawn: function(room) {
+	spawn(room) {
 		// TODO change this to closest room spawner
-		var spawn = Game.spawns['Spawn1'];
+		//var spawn = Game.spawns['Spawn1'];
+		let spawn = this.getSpawn(room);
 		
 		// if spawn is allready spawning then lets just skip for now
 		if (spawn.spawning) {
 			return false;
 		}
 		
+		let room_energy_capacity = room.energyCapacityAvailable;
+		
 		// TODO change this to be calculated by the room
-		var max_upgraders = 5;
+		var max_upgraders = 1;
+		
+		if (room_energy_capacity > 550) {
+			var max_upgraders = 5;
+		}
 		
 		// get all upgraders
 		var upgraders = _.filter(room.find(FIND_MY_CREEPS), (creep) => creep.memory.role == this.data.role);
@@ -114,10 +135,8 @@ var roleUpgrader = {
 		
 		// spawn
 		let newName = this.data.name + '_' + Game.time;
-		if (spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role}}) == OK) {
-			console.log('Spawning new ' + this.data.role + ': ' + newName);
+		if (spawn.spawnCreep(this.parts(room), newName, {memory: {role: this.data.role, home: room.name}}) == OK) {
+			console.log('Spawning new ' + this.data.role + ': ' + newName + ' in: ' + room.name);
 		}
-	},
-};
-
-module.exports = roleUpgrader;
+	}
+}
