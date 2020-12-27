@@ -42,7 +42,7 @@ class Role {
 				// get closest container with energy in it
 				let container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
 					filter: (structure) => {
-						return structure.structureType == STRUCTURE_CONTAINER && structure.store.getUsedCapacity(RESOURCE_ENERGY) > 500;
+						return structure.structureType == STRUCTURE_CONTAINER && (structure.store.getUsedCapacity(RESOURCE_ENERGY) > 500 || (creep.memory.role == 'harvester' && structure.store.getUsedCapacity(RESOURCE_ENERGY) > 0));
 					}
 				});
 				
@@ -73,6 +73,10 @@ class Role {
 				creep.moveTo(source_target, {visualizePathStyle: {stroke: '#ffaa00'}});
 			}
 		} else {
+			// lets reset if no energy in storage
+			if (source_target.store.getUsedCapacity(RESOURCE_ENERGY) == 0) {
+				creep.memory.source = undefined;
+			}
 			if (creep.withdraw(source_target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
 				creep.moveTo(source_target, {visualizePathStyle: {stroke: '#ffaa00'}});
 			}

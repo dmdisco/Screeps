@@ -36,6 +36,7 @@ module.exports = class roleFixer extends Role {
         }
 
         if(creep.memory.fixing) {
+			creep.memory.source = undefined;
             /*var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
             if(targets.length) {
                 if(creep.build(targets[0]) == ERR_NOT_IN_RANGE) {
@@ -115,7 +116,7 @@ module.exports = class roleFixer extends Role {
 		// TODO change this to be calculated by the room
 		var max_fixers = 1;
 		
-		if (room_energy_capacity > 550) {
+		if (room_energy_capacity > 500) {
 			var max_fixers = 2;
 		}
 		

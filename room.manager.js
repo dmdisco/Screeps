@@ -1,5 +1,20 @@
 require('constants');
 
+// room manager should implement a system to handle spawning priority
+/*
+spawn priority list:
+* 1 harvester
+* if mining containers are up 1 miner
+* 1 fixer
+* 1 harvester
+* if mining containers are up 1 miner
+* 1 upgrader
+* 1 builder if anything to build
+* 1 fixer
+* the rest of upgraders/builders and energy movers if storage is available
+* utility (claim, reserve etc.) and defense/offense creeps
+*/
+
 module.exports = class RoomManager {
 	constructor(room) {
 		this.room_name = room;

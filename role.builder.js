@@ -78,6 +78,7 @@ module.exports = class roleBuilder extends Role {
 	
 	/** @param {Room} room **/
 	spawn(room) {
+		//if (room.name == 'W6N8') return;
 		// TODO change this to closest room spawner
 		let spawn = this.getSpawn(room);
 		
@@ -97,8 +98,8 @@ module.exports = class roleBuilder extends Role {
 		// TODO change this to be calculated by the room
 		var max_builders = 1;
 		
-		if (room_energy_capacity > 550) {
-			var max_builders = 3;
+		if (room_energy_capacity > 500 && room.storage != undefined) {
+			var max_builders = 2;
 		}
 		
 		// get all builders

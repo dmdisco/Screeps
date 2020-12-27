@@ -76,6 +76,7 @@ module.exports = class roleUpgrader extends Role {
         }
 
         if(creep.memory.upgrading) {
+			creep.memory.source = undefined;
             if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(creep.room.controller, {visualizePathStyle: {stroke: '#ffffff'}});
             }
@@ -108,6 +109,7 @@ module.exports = class roleUpgrader extends Role {
 	
 	/** @param {Room} room **/
 	spawn(room) {
+		//if (room.name == 'W6N8') return;
 		// TODO change this to closest room spawner
 		//var spawn = Game.spawns['Spawn1'];
 		let spawn = this.getSpawn(room);
@@ -122,8 +124,12 @@ module.exports = class roleUpgrader extends Role {
 		// TODO change this to be calculated by the room
 		var max_upgraders = 1;
 		
-		if (room_energy_capacity > 550) {
-			var max_upgraders = 5;
+		if (room_energy_capacity > 500) {
+			max_upgraders = 2;
+		}
+		
+		if (room.storage != undefined) {
+			max_upgraders = 5;
 		}
 		
 		// get all upgraders
